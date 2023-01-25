@@ -11,3 +11,11 @@ services:
     volumes:
       - ./portainer:/data
       - /var/run/docker.sock:/var/run/docker.sock
+  
+  registry:
+    restart: always
+    image: registry:2.8.1
+    ports:
+      - 5000:5000
+    volumes:
+      - ./registry/data:/var/lib/registry
