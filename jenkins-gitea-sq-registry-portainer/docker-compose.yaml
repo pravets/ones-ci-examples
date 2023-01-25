@@ -7,7 +7,7 @@ services:
     image: portainer/portainer-ce:2.16.2-alpine #https://hub.docker.com/r/portainer/portainer-ce/tags
     restart: always
     ports:
-      - 9000:9000
+      - 9090:9000
     volumes:
       - ./portainer/data:/data
       - /var/run/docker.sock:/var/run/docker.sock
@@ -31,3 +31,40 @@ services:
         - ./jenkins/data:/var/jenkins_home
         - /var/run/docker.sock:/var/run/docker.sock
         - /usr/local/bin/docker:/usr/local/bin/docker
+
+  sonarqube:
+    container_name: sonarqube
+    image: sonarqube:9.7.0-community
+    restart: always
+    ports:
+      - 9000:9000
+    environment:
+      - sonar.jdbc.url=jdbc:postgresql://pg:5432/sonar
+      - sonar.jdbc.username=${POSTGRES_USER}
+      - sonar.jdbc.password=${POSTGRES_PASSWORD}
+      - sonar.search.javaAdditionalOpts=-Dnode.store.allow_mmap=false
+      - sonar.web.javaAdditionalOpts=-javaagent:./extensions/plugins/sonarqube-community-branch-plugin.jar=web
+      - sonar.ce.javaAdditionalOpts=-javaagent:./extensions/plugins/sonarqube-community-branch-plugin.jar=ce
+      - sonar.ce.javaOpts=-Xmx4G
+      - sonar.web.javaOpts=-Xmx4G
+    volumes:
+      - ./sq/conf:/opt/sonarqube/conf
+      - ./sq/logs:/opt/sonarqube/logs
+      - ./sq/data:/opt/sonarqube/data
+      - ./sq/extensions:/opt/sonarqube/extensions
+      - ./sq/bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+    depends_on:
+      - postgresql
+
+  postgresql:
+    container_name: postgresql
+    image: postgres:15.1
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./pg/postgresql:/var/lib/postgresql
+      - ./pg/data:/var/lib/postgresql/data
