@@ -1,3 +1,5 @@
 jenkins-gitea-sq-registry-portainer/portainer/
 jenkins-gitea-sq-registry-portainer/jenkins/
 jenkins-gitea-sq-registry-portainer/registry/
+jenkins-gitea-sq-registry-portainer/sq/
+.env
